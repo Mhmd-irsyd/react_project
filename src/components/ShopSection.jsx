@@ -21,23 +21,30 @@ const ShopSection = () => {
         const querySnapshot = await getDocs(collection(db, "products"));
         const fetchedProducts = querySnapshot.docs.map((doc) => {
           const productData = doc.data();
-          
+    
+          // Pastikan price adalah string, jika tidak konversi menjadi string terlebih dahulu
+          let price = productData.price;
+          if (typeof price === 'number') {
+            price = price.toString();  // Ubah angka menjadi string
+          }
+    
           // Menghapus titik dan mengubah harga menjadi angka
-          const price = parseFloat(productData.price.replace(/\./g, "").replace(',', '.'));  // Menghapus titik dan mengubah harga menjadi angka dengan penanganan koma sebagai pemisah desimal
+          price = parseFloat(price.replace(/\./g, "").replace(',', '.'));
     
           return {
             id: doc.id,
             ...productData,
-            price: price,
+            price: price,  // Simpan harga yang sudah diformat
           };
         });
-        
+    
         console.log(fetchedProducts);  // Cek harga produk setelah konversi
         setProducts(fetchedProducts);
       } catch (error) {
         console.error("Gagal mengambil produk:", error);
       }
     };
+    
     
     fetchProducts();
   }, []);

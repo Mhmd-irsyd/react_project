@@ -89,22 +89,39 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { name, shortDescription, fullDescription, price, category, images, variations } = product;
-
-    if (!name || !shortDescription || !fullDescription || !price || !category || images.length === 0 || variations.length === 0) {
+  
+    const {
+      name,
+      shortDescription,
+      fullDescription,
+      price,
+      category,
+      images,
+      variations,
+    } = product;
+  
+    if (
+      !name ||
+      !shortDescription ||
+      !fullDescription ||
+      !price ||
+      !category ||
+      images.length === 0 ||
+      variations.length === 0
+    ) {
       alert("Semua field wajib diisi!");
       return;
     }
-
+  
     try {
-      // Persiapkan data produk dengan konversi ke number
+      // Pastikan price dikirim sebagai string dengan format ribuan
+      const formattedPrice = price.toString().trim().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  
       const preparedProduct = {
         ...product,
-        price: Number(product.price), // Convert harga dari input ke number
+        price: formattedPrice,
       };
-
-      // Catatan: Variasi sudah dibuat dengan angka (untuk non-sepatu menggunakan parseInt)
+  
       const id = await addProductToFirestore(preparedProduct);
       alert("Produk berhasil ditambahkan!");
       navigate("/admin/products");
@@ -113,6 +130,8 @@ const AddProduct = () => {
       alert("Gagal menyimpan produk.");
     }
   };
+  
+  
 
   return (
     <div className="max-w-3xl mx-auto p-6">

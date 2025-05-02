@@ -1,11 +1,43 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
-import products from "../data/productsTemp";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../services/firebase";
 
 const Hero = () => {
   const navigate = useNavigate();
-  const product = products.find((p) => p.id === 1); // Ambil produk pertama
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const products = [];
+        querySnapshot.forEach((doc) => {
+          products.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Cari produk dengan kata "jam" di nama (case insensitive)
+        const jamTangan = products.find((p) =>
+          p.name?.toLowerCase().includes("jam")
+        );
+        setProduct(jamTangan);
+      } catch (error) {
+        console.error("❌ Gagal mengambil produk:", error.message);
+      }
+    };
+
+    fetchProduct();
+  }, []);
+
+  if (!product) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-blue-100 pt-24 md:pt-32">
+        <p className="text-gray-600 text-xl">Memuat produk terbaik...</p>
+      </div>
+    );
+  }
 
   return (
     <section className="w-full min-h-screen flex items-center justify-center bg-blue-100 pt-24 md:pt-32">
@@ -47,7 +79,7 @@ const Hero = () => {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${product.images[0]})` }}
+            style={{ backgroundImage: `url(${product.images?.[0]})` }}
           ></div>
           <div className="absolute inset-0 bg-black/50"></div>
 
@@ -64,12 +96,20 @@ const Hero = () => {
           <div className="absolute bottom-6 left-6 text-white space-y-2">
             <h2 className="text-2xl font-bold">{product.name}</h2>
             <p className="text-white/90 text-lg">{product.shortDescription}</p>
-            <p className="text-yellow-300 text-2xl font-semibold">Rp {product.price.toLocaleString()}</p>
-            
+            <p className="text-yellow-300 text-2xl font-semibold">
+              Rp {Number(product.price).toLocaleString()}
+            </p>
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(`/product/${product.id}`)}
+              onClick={() => {
+                if (product?.id) {
+                  navigate(`/product/${product.id}`);
+                } else {
+                  console.warn("⚠️ ID produk tidak ditemukan!");
+                }
+              }}
               className="mt-3 px-5 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition"
             >
               Lihat Detail

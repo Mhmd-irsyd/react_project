@@ -1,8 +1,16 @@
 import { useAuth } from "../context/AuthContext";  
 import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({ children, requiredRole = "user" }) => {
   const { currentUser, loading } = useAuth();  
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !currentUser) {
+      setIsRedirecting(true);  // Begin redirecting after the auth check is complete
+    }
+  }, [loading, currentUser]);
 
   if (loading) {
     // Menunggu status autentikasi dari Firebase
@@ -15,7 +23,7 @@ const ProtectedRoute = ({ children, requiredRole = "user" }) => {
       <div className="text-center p-10">
         <h2 className="text-2xl font-semibold text-gray-700">You need to log in first</h2>
         <p className="text-gray-500">Silakan login untuk mengakses halaman ini.</p>
-        <Navigate to="/login" />
+        {isRedirecting && <Navigate to="/login" />}
       </div>
     );
   }
@@ -34,3 +42,4 @@ const ProtectedRoute = ({ children, requiredRole = "user" }) => {
 };
 
 export default ProtectedRoute;
+
