@@ -23,7 +23,7 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+   <div className="flex flex-col min-h-screen bg-gray-100 overflow-x-hidden">
       {/* Navbar: Jika belum login & di atas, transparan */}
       <Navbar isTransparent={!currentUser && isAtTop} />
 

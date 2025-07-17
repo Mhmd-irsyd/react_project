@@ -40,7 +40,7 @@ const Hero = () => {
   }
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center bg-blue-100 pt-24 md:pt-32">
+    <section className="w-full min-h-screen flex items-center justify-center bg-blue-100 pt-24 md:pt-32 overflow-x-hidden">
       <div className="w-full max-w-7xl px-6 md:px-12 lg:px-16 grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
         
         {/* Bagian Teks */}
